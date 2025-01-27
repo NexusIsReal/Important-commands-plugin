@@ -3,7 +3,8 @@
 build/
 out/
 classes/
-
+gradlew
+gradle/
 # Eclipse
 *.launch
 .settings/
