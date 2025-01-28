@@ -6,7 +6,6 @@ commands:
   gamemode:
     description: Set gamemode for yourself or another player
     usage: /gamemode <type> [player]
-    aliases: [gm]
   god:
     description: Toggle god mode for yourself or another player
     usage: /god [player]
@@ -16,7 +15,6 @@ commands:
   enderchest:
     description: Open your or another player's enderchest
     usage: /enderchest [player]
-    aliases: [ec]
   fix:
     description: Fix the durability of the item in your hand
     usage: /fix
@@ -26,11 +24,9 @@ commands:
   tpaaccept:
     description: Accept a pending teleport request
     usage: /tpaaccept
-    aliases: [tpaccept]
   tpadeny:
     description: Deny a pending teleport request
     usage: /tpadeny
-    aliases: [tpdeny]
   trash:
     description: Open trash menu to dispose items
     usage: /trash
@@ -49,6 +45,6 @@ permissions:
   nexusplugin.fix:
     default: op
   nexusplugin.tpa:
-    default: true
+    default: op
   nexusplugin.trash:
-    default: true 
+    default: op 

@@ -8,7 +8,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 public class TrashCommand implements CommandExecutor, Listener {
@@ -38,6 +41,25 @@ public class TrashCommand implements CommandExecutor, Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         if (event.getView().getTitle().equals(TRASH_TITLE)) {
             event.getInventory().clear();
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getView().getTitle().equals(TRASH_TITLE)) {
+            if (event.getClickedInventory() != null && 
+                event.getClickedInventory().getType() == InventoryType.CREATIVE) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getView().getTitle().equals(TRASH_TITLE)) {
+            if (event.getInventory().getType() == InventoryType.CREATIVE) {
+                event.setCancelled(true);
+            }
         }
     }
 } 
