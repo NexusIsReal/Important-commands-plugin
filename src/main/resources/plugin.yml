@@ -38,13 +38,17 @@ permissions:
     default: op
   nexusplugin.openinv:
     default: op
+  nexusplugin.openinv.edit:
+    default: op
   nexusplugin.enderchest:
     default: op
   nexusplugin.enderchest.others:
     default: op
+  nexusplugin.enderchest.edit:
+    default: op
   nexusplugin.fix:
     default: op
   nexusplugin.tpa:
-    default: op
+    default: true
   nexusplugin.trash:
-    default: op 
+    default: true 
