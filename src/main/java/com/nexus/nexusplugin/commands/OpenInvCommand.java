@@ -1,7 +1,7 @@
 package com.nexus.nexusplugin.commands;
 
 import com.nexus.nexusplugin.utils.MessageUtils;
-import com.nexus.nexusplugin.utils.CommandUtils;
+import com.nexus.nexusplugin.managers.InventoryManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class OpenInvCommand implements CommandExecutor {
+    private final InventoryManager inventoryManager;
+
+    public OpenInvCommand(InventoryManager inventoryManager) {
+        this.inventoryManager = inventoryManager;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("nexusplugin.openinv")) {
@@ -23,19 +29,21 @@ public class OpenInvCommand implements CommandExecutor {
 
         if (args.length < 1) return false;
 
+        Player player = (Player) sender;
         Player target = Bukkit.getPlayer(args[0]);
+
         if (target == null) {
-            sender.sendMessage(MessageUtils.getMessage("player-not-found"));
+            player.sendMessage(MessageUtils.getMessage("player-not-found"));
             return true;
         }
 
-        Player player = (Player) sender;
-        player.openInventory(target.getInventory());
-        
-        CommandUtils.notifyPlayers(sender, target,
-            "inventory-opened-target",
-            "inventory-opened",
-            "%player%", player.getName());
+        if (target == player) {
+            player.sendMessage(MessageUtils.getMessage("openinv-self"));
+            return true;
+        }
+
+        inventoryManager.openPlayerInventory(player, target);
+        player.sendMessage(MessageUtils.formatMessage("openinv-success", "%player%", target.getName()));
 
         return true;
     }

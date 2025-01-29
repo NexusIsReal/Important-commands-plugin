@@ -1,22 +1,34 @@
 package com.nexus.nexusplugin.listeners;
 
-import org.bukkit.entity.Player;
+import com.nexus.nexusplugin.managers.InventoryManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class InventoryListener implements Listener {
+    private final InventoryManager inventoryManager;
+
+    public InventoryListener(InventoryManager inventoryManager) {
+        this.inventoryManager = inventoryManager;
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
-        
-        String title = event.getView().getTitle();
-        if (title.endsWith("'s Inventory") || title.endsWith("'s Enderchest")) {
-            Player viewer = (Player) event.getWhoClicked();
-            if (!viewer.hasPermission("nexusplugin.openinv.edit") && 
-                !viewer.hasPermission("nexusplugin.enderchest.edit")) {
+        if (inventoryManager.isTrashInventory(event.getInventory())) {
+            if (event.getClickedInventory() != null && 
+                event.getClickedInventory().getType() == InventoryType.CREATIVE) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (inventoryManager.isTrashInventory(event.getInventory())) {
+            if (event.getInventory().getType() == InventoryType.CREATIVE) {
                 event.setCancelled(true);
             }
         }
@@ -24,11 +36,6 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        for (Player viewer : player.getServer().getOnlinePlayers()) {
-            if (viewer.getOpenInventory().getTitle().contains(player.getName())) {
-                viewer.closeInventory();
-            }
-        }
+        inventoryManager.removeTrashInventory(event.getPlayer().getUniqueId());
     }
 } 

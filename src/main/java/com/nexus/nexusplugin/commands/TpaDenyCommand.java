@@ -2,6 +2,8 @@ package com.nexus.nexusplugin.commands;
 
 import com.nexus.nexusplugin.utils.MessageUtils;
 import com.nexus.nexusplugin.utils.CommandUtils;
+import com.nexus.nexusplugin.managers.TpaManager;
+import com.nexus.nexusplugin.models.TpaRequest;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +11,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class TpaDenyCommand implements CommandExecutor {
+    private final TpaManager tpaManager;
+
+    public TpaDenyCommand(TpaManager tpaManager) {
+        this.tpaManager = tpaManager;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("nexusplugin.tpa")) {
@@ -22,7 +30,7 @@ public class TpaDenyCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        TpaCommand.TpaRequest request = TpaCommand.getRequest(player.getUniqueId());
+        TpaRequest request = tpaManager.getRequest(player.getUniqueId());
 
         if (request == null) {
             player.sendMessage(MessageUtils.getMessage("tpa-no-request"));
@@ -30,7 +38,7 @@ public class TpaDenyCommand implements CommandExecutor {
         }
 
         Player requester = Bukkit.getPlayer(request.getSender());
-        TpaCommand.removeRequest(player.getUniqueId());
+        tpaManager.removeRequest(player.getUniqueId());
 
         if (requester != null && requester.isOnline()) {
             CommandUtils.notifyPlayers(player, requester,

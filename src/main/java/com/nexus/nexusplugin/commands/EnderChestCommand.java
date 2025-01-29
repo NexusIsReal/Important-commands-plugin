@@ -1,7 +1,7 @@
 package com.nexus.nexusplugin.commands;
 
 import com.nexus.nexusplugin.utils.MessageUtils;
-import com.nexus.nexusplugin.utils.CommandUtils;
+import com.nexus.nexusplugin.managers.InventoryManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EnderChestCommand implements CommandExecutor {
+    private final InventoryManager inventoryManager;
+
+    public EnderChestCommand(InventoryManager inventoryManager) {
+        this.inventoryManager = inventoryManager;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("nexusplugin.enderchest")) {
@@ -22,26 +28,23 @@ public class EnderChestCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        if (args.length > 0) {
-            if (!player.hasPermission("nexusplugin.enderchest.others")) {
-                player.sendMessage(MessageUtils.getMessage("no-permission"));
-                return true;
-            }
+        Player target;
 
-            Player target = Bukkit.getPlayer(args[0]);
+        if (args.length > 0) {
+            target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 player.sendMessage(MessageUtils.getMessage("player-not-found"));
                 return true;
             }
-
-            player.openInventory(target.getEnderChest());
-            CommandUtils.notifyPlayers(sender, target,
-                "enderchest-opened-target",
-                "enderchest-opened-other",
-                "%player%", player.getName());
         } else {
-            player.openInventory(player.getEnderChest());
-            player.sendMessage(MessageUtils.getMessage("enderchest-opened"));
+            target = player;
+        }
+
+        inventoryManager.openEnderChest(player, target);
+        if (target != player) {
+            player.sendMessage(MessageUtils.formatMessage("enderchest-other", "%player%", target.getName()));
+        } else {
+            player.sendMessage(MessageUtils.getMessage("enderchest-self"));
         }
 
         return true;

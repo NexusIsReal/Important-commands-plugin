@@ -1,19 +1,24 @@
 package com.nexus.nexusplugin.listeners;
 
+import com.nexus.nexusplugin.managers.GodManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class GodListener implements Listener {
+    private final GodManager godManager;
+
+    public GodListener(GodManager godManager) {
+        this.godManager = godManager;
+    }
+
     @EventHandler
-    public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (player.isInvulnerable()) {
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (godManager.isInGodMode(player.getUniqueId())) {
                 event.setCancelled(true);
             }
         }
@@ -21,19 +26,19 @@ public class GodListener implements Listener {
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (player.isInvulnerable()) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (godManager.isInGodMode(player.getUniqueId())) {
                 event.setCancelled(true);
-                player.setFoodLevel(20);
-                player.setSaturation(20f);
             }
         }
     }
 
     @EventHandler
     public void onEntityTarget(EntityTargetEvent event) {
-        if (event.getTarget() instanceof Player player) {
-            if (player.isInvulnerable()) {
+        if (event.getTarget() instanceof Player) {
+            Player player = (Player) event.getTarget();
+            if (godManager.isInGodMode(player.getUniqueId())) {
                 event.setCancelled(true);
             }
         }
@@ -42,15 +47,21 @@ public class GodListener implements Listener {
     @EventHandler
     public void onPotionSplash(PotionSplashEvent event) {
         event.getAffectedEntities().removeIf(entity -> 
-            entity instanceof Player player && player.isInvulnerable());
+            entity instanceof Player && godManager.isInGodMode(entity.getUniqueId()));
     }
 
     @EventHandler
     public void onEntityCombust(EntityCombustEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (player.isInvulnerable()) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (godManager.isInGodMode(player.getUniqueId())) {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        godManager.removeGodMode(event.getPlayer().getUniqueId());
     }
 } 
